@@ -1,0 +1,117 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  HAS_PAT: ${{ secrets.DALAMUDPLUGINS_PAT != '' }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Download Dalamud dev libs
+        run: |
+          curl -fL https://goatcorp.github.io/dalamud-distrib/latest.zip -o dalamud.zip
+          unzip -q dalamud.zip -d dalamud
+
+      - name: Resolve release version
+        id: ver
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION=$(python3 -c "import json;print(json.load(open('PixelPerfect/PixelPerfect.json'))['AssemblyVersion'])")
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Sync manifest version
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path("PixelPerfect/PixelPerfect.json")
+          data = json.loads(path.read_text(encoding="utf-8"))
+          data["AssemblyVersion"] = "${{ steps.ver.outputs.version }}"
+          path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          PY
+          test "$(python3 -c "import json;print(json.load(open('PixelPerfect/PixelPerfect.json'))['AssemblyVersion'])")" = "${{ steps.ver.outputs.version }}"
+
+      - name: Build
+        run: dotnet build PixelPerfect.sln -c Release -nologo -p:Version=${{ steps.ver.outputs.version }}
+        env:
+          DALAMUD_HOME: ${{ github.workspace }}/dalamud
+
+      - name: Package latest.zip
+        run: |
+          cd PixelPerfect/bin/Release
+          zip latest.zip PixelPerfect.dll PixelPerfect.json PixelPerfect.deps.json
+          echo "=== latest.zip contents ==="
+          python3 -c "import zipfile;[print(n) for n in zipfile.ZipFile('latest.zip').namelist()]"
+
+      - name: Create or update source release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.ver.outputs.tag }}"
+          ZIP="PixelPerfect/bin/Release/latest.zip"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$ZIP" --clobber
+          else
+            gh release create "$TAG" "$ZIP" \
+              --title "$TAG" \
+              --target ${{ github.sha }} \
+              --generate-notes
+          fi
+
+      - name: Publish to DalamudPlugins meta repo
+        if: ${{ env.HAS_PAT == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.DALAMUDPLUGINS_PAT }}
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          META=denghaoxuan991876906/DalamudPlugins
+          TAG="PixelPerfect-v${VERSION}"
+          ZIP="PixelPerfect/bin/Release/latest.zip"
+          if gh release view "$TAG" --repo "$META" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$ZIP" --repo "$META" --clobber
+          else
+            gh release create "$TAG" "$ZIP" --repo "$META" \
+              --title "$TAG" --target main --generate-notes
+          fi
+          python3 - <<'PY'
+          import base64
+          import json
+          import os
+          import subprocess
+          meta = "denghaoxuan991876906/DalamudPlugins"
+          ver = os.environ["VERSION"]
+          path = "plugins/PixelPerfect/PixelPerfect.json"
+          obj = json.loads(subprocess.check_output(["gh", "api", f"/repos/{meta}/contents/{path}"]))
+          data = json.loads(base64.b64decode(obj["content"]))
+          if data.get("AssemblyVersion") == ver:
+              print(f"manifest already at {ver} -- skip")
+              raise SystemExit
+          data["AssemblyVersion"] = ver
+          b64 = base64.b64encode(json.dumps(data, ensure_ascii=False, indent=2).encode()).decode()
+          subprocess.run(["gh", "api", "-X", "PUT", f"/repos/{meta}/contents/{path}",
+            "-f", f"message=chore(publish): PixelPerfect v{ver}",
+            "-f", f"content={b64}",
+            "-f", f"sha={obj['sha']}",
+            "-f", "branch=main"], check=True)
+          print(f"manifest bumped to {ver}")
+          PY
