@@ -89,9 +89,9 @@ public class Config : IPluginConfiguration
 
     public IndicatorType Type { get; set; } = IndicatorType.Dot;
 
-    public System.Numerics.Vector4 Colour { get; set; } = new(1f, 1f, 1f, 1f);
+    public System.Numerics.Vector4 Colour { get; set; } = new(1f, 0f, 0f, 1f);
 
-    public float Scale { get; set; } = 12f;
+    public float Scale { get; set; } = 4f;
 
     public bool OnlyInCombat { get; set; }
 

@@ -17,7 +17,7 @@ public sealed class ConfigWindow : Window
         this.configuration = configuration;
         this.saveConfig = saveConfig;
 
-        this.Size = new Vector2(360, 220);
+        this.Size = new Vector2(380, 250);
         this.SizeCondition = ImGuiCond.FirstUseEver;
     }
 
@@ -35,6 +35,42 @@ public sealed class ConfigWindow : Window
         {
             this.configuration.Colour = colour;
             this.saveConfig();
+        }
+
+        ImGui.Text("快捷颜色");
+        if (ImGui.Button("红色"))
+        {
+            this.SetColour(new Vector4(1f, 0f, 0f, 1f));
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("黄色"))
+        {
+            this.SetColour(new Vector4(1f, 1f, 0f, 1f));
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("绿色"))
+        {
+            this.SetColour(new Vector4(0f, 1f, 0f, 1f));
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("青色"))
+        {
+            this.SetColour(new Vector4(0f, 1f, 1f, 1f));
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("蓝色"))
+        {
+            this.SetColour(new Vector4(0f, 0.45f, 1f, 1f));
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("白色"))
+        {
+            this.SetColour(new Vector4(1f, 1f, 1f, 1f));
         }
 
         var scale = this.configuration.Scale;
@@ -57,5 +93,11 @@ public sealed class ConfigWindow : Window
             this.configuration.OnlyInInstance = onlyInInstance;
             this.saveConfig();
         }
+    }
+
+    private void SetColour(Vector4 colour)
+    {
+        this.configuration.Colour = colour;
+        this.saveConfig();
     }
 }
