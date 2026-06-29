@@ -1,4 +1,8 @@
-﻿[*.cs]
+root = true
 
-# CA1416: Validate platform compatibility
+[*]
+end_of_line = lf
+insert_final_newline = true
+
+[*.cs]
 dotnet_diagnostic.CA1416.severity = none
