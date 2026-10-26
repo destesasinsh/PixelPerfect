@@ -84,7 +84,7 @@ jobs:
           GH_TOKEN: ${{ secrets.DALAMUDPLUGINS_PAT }}
           VERSION: ${{ steps.ver.outputs.version }}
         run: |
-          META=denghaoxuan991876906/DalamudPlugins
+          META=destesasinsh/DalamudPlugins
           TAG="PixelPerfect-v${VERSION}"
           ZIP="PixelPerfect/bin/Release/latest.zip"
           if gh release view "$TAG" --repo "$META" >/dev/null 2>&1; then
@@ -98,7 +98,7 @@ jobs:
           import json
           import os
           import subprocess
-          meta = "denghaoxuan991876906/DalamudPlugins"
+          meta = "destesasinsh/DalamudPlugins"
           ver = os.environ["VERSION"]
           path = "plugins/PixelPerfect/PixelPerfect.json"
           obj = json.loads(subprocess.check_output(["gh", "api", f"/repos/{meta}/contents/{path}"]))

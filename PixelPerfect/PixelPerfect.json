@@ -2,10 +2,11 @@
   "Author": "嗨呀",
   "Name": "判定点指示器",
   "InternalName": "PixelPerfect",
-  "AssemblyVersion": "3.3.4.0",
+  "AssemblyVersion": "3.3.5.0",
+  "DalamudApiLevel": 15,
   "Description": "显示角色判定点，支持圆点/圆环样式与基础显示条件。",
   "ApplicableVersion": "any",
-  "RepoUrl": "https://github.com/denghaoxuan991876906/PixelPerfect",
+  "RepoUrl": "https://github.com/destesasinsh/PixelPerfect",
   "Tags": [
     "判定点",
     "覆盖层",
@@ -15,11 +16,11 @@
   "LoadSync": false,
   "LoadPriority": 0,
   "ImageUrls": [
-    "https://raw.githubusercontent.com/denghaoxuan991876906/PixelPerfect/master/images/image3.png",
-    "https://raw.githubusercontent.com/denghaoxuan991876906/PixelPerfect/master/images/image2.png",
-    "https://raw.githubusercontent.com/denghaoxuan991876906/PixelPerfect/master/images/image1.png"
+    "https://raw.githubusercontent.com/destesasinsh/PixelPerfect/master/images/image3.png",
+    "https://raw.githubusercontent.com/destesasinsh/PixelPerfect/master/images/image2.png",
+    "https://raw.githubusercontent.com/destesasinsh/PixelPerfect/master/images/image1.png"
   ],
-  "IconUrl": "https://raw.githubusercontent.com/denghaoxuan991876906/PixelPerfect/master/images/icon.png",
+  "IconUrl": "https://raw.githubusercontent.com/destesasinsh/PixelPerfect/master/images/icon.png",
   "Punchline": "即开即用的角色判定点指示器。",
   "AcceptsFeedback": true
 }

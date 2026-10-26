@@ -1,8 +1,8 @@
-﻿<Project Sdk="Dalamud.NET.Sdk/15.0.0">
+<Project Sdk="Dalamud.NET.Sdk/15.0.0">
 
     <PropertyGroup>
         <Authors>Haplo064</Authors>
-        <Version>3.3.4.0</Version>
+        <Version>3.3.5.0</Version>
         <Description>Perfecting Pixels</Description>
         <PackageProjectUrl>https://github.com/Haplo064/PixelPerfect</PackageProjectUrl>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
